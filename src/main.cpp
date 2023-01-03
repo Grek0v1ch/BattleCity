@@ -3,8 +3,26 @@
 
 #include <iostream>
 
+// Размер окна по координате Х (ширина)
 int g_windowSizeX = 640;
+// Размер окна по координате У (высота)
 int g_windowSizeY = 480;
+
+/**
+ * Функция-callback для обработки изменения размеров окна
+ * @param pWindow  указатель на окно
+ * @param width новое значение ширины окна
+ * @param height новое значение высоты окна
+ * */
+void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height);
+
+/**
+ * Функция-callback для обработки нажатия клавиш
+ * @param pWindow  указатель на окно
+ * @param key код клавиши
+ * @param action действие с клавишей
+ * */
+void glfwKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mode);
 
 int main() {
     /* Initialize the library */
@@ -29,6 +47,9 @@ int main() {
         glfwTerminate();
         return -1;
     }
+
+    glfwSetWindowSizeCallback(pWindow, glfwWindowSizeCallback);
+    glfwSetKeyCallback(pWindow, glfwKeyCallback);
 
     /* Make the window's context current */
     glfwMakeContextCurrent(pWindow);
@@ -62,4 +83,16 @@ int main() {
 
     glfwTerminate();
     return 0;
+}
+
+void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height) {
+    g_windowSizeX = width;
+    g_windowSizeY = height;
+    glViewport(0, 0, g_windowSizeX, g_windowSizeY);
+}
+
+void glfwKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mode) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(pWindow, GL_TRUE);
+    }
 }
