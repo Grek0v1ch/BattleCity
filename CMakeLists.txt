@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.23)
 set(PROJECT_NAME BattleCity)
 set(SOURCE_DIR src)
 
+set(CMAKE_CXX_STANDARD 11)
+
 project(${PROJECT_NAME})
 
 add_executable(${PROJECT_NAME} ${SOURCE_DIR}/main.cpp)
