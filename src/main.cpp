@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include "Renderer/ShaderProgram.h"
+
 // Координаты вершин треугольника
 GLfloat point[] = {
     0.0f, 0.5f, 0.0f,
@@ -17,7 +19,7 @@ GLfloat color[] = {
     0.0f, 0.0f, 1.0f
 };
 
-const GLchar* vertexShader {
+const GLchar* pVertexShader {
     "#version 410 core\n"
     "layout (location = 0) in vec3 vertexPosition;\n"
     "layout (location = 1) in vec3 vertexColor;\n"
@@ -28,7 +30,7 @@ const GLchar* vertexShader {
     "}\0"
 };
 
-const GLchar* fragmentShader {
+const GLchar* pFragmentShader {
     "#version 410 core\n"
     "in vec3 color;\n"
     "out vec4 fragColor;\n"
@@ -57,30 +59,6 @@ void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height);
  * @param action действие с клавишей
  * */
 void glfwKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mode);
-
-bool checkShaderErrors(GLuint shader) {
-    GLint success;
-    GLchar infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (! success) {
-	    glGetShaderInfoLog(shader, 512, NULL, infoLog);
-	    std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
-        return false;
-    }
-    return true;
-}
-
-bool checkProgramErrors(GLuint program) {
-    GLint success;
-    GLchar infoLog[512];
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (! success) {
-        glGetProgramInfoLog(program, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::LINKING_FAILED\n" << infoLog << std::endl;
-        return false;
-    }
-    return true;
-}
 
 int main() {
     /* Initialize the library */
@@ -128,35 +106,14 @@ int main() {
 
     glClearColor(1, 1, 0 , 1);
 
-    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &vertexShader, nullptr);
-    glCompileShader(vs);
-    if (! checkShaderErrors(vs)) {
-        std::cout << "Vertex" << std::endl;
+    std::string vertexShader(pVertexShader);
+    std::string fragmentShader(pFragmentShader);
+    Renderer::ShaderProgram shaderProgram(vertexShader, fragmentShader);
+    if (! shaderProgram.isCompiled()) {
+        std::cerr << "Can't create shader program!" << std::endl;
         glfwTerminate();
         return -1;
     }
-
-    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &fragmentShader, nullptr);
-    glCompileShader(fs);
-    if (! checkShaderErrors(fs)) {
-        std::cout << "Fragment" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vs);
-    glAttachShader(shaderProgram, fs);
-    glLinkProgram(shaderProgram);
-    if (! checkProgramErrors(shaderProgram)) {
-        std::cout << "Linking" << std::endl;
-        return -1;
-    }
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
 
     GLuint pointsVBO = 0;
     glGenBuffers(1, &pointsVBO);
@@ -185,7 +142,7 @@ int main() {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        shaderProgram.use();
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
