@@ -44,6 +44,7 @@ namespace Renderer {
          * Метод запускает шейдерную программу.
          * */
         void use() const;
+        void setInt(const std::string& name, const GLint value);
 
     private:
         // Поле показывает, собралась шейдерная программа или нет

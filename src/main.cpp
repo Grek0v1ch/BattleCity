@@ -1,10 +1,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/vec2.hpp>
 
 #include <iostream>
 
 #include "Renderer/ShaderProgram.h"
 #include "Resources/ResourceManager.h"
+#include "Renderer/Texture2D.h"
 
 // Координаты вершин треугольника
 GLfloat point[] = {
@@ -20,10 +22,15 @@ GLfloat color[] = {
     0.0f, 0.0f, 1.0f
 };
 
-// Размер окна по координате Х (ширина)
-int g_windowSizeX = 640;
-// Размер окна по координате У (высота)
-int g_windowSizeY = 480;
+// Координаты текстуры
+GLfloat texCoord[] = {
+    0.5f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f
+};
+
+glm::ivec2 g_windowSize(640, 480);
+
 
 /**
  * Функция-callback для обработки изменения размеров окна
@@ -57,7 +64,7 @@ int main(int argc, char** argv) {
 #endif
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* pWindow = glfwCreateWindow(g_windowSizeX, g_windowSizeY,
+    GLFWwindow* pWindow = glfwCreateWindow(g_windowSize.x, g_windowSize.y,
                                            "Battle City", nullptr, nullptr);
     if (! pWindow) {
         std::cout << "Window not initialized" << std::endl;
@@ -98,7 +105,7 @@ int main(int argc, char** argv) {
             return -1;
         }
 
-        resourceManager.loadTexture("Default Texture", "res/textures/map_16x16.png");
+        auto pTex = resourceManager.loadTexture("Default Texture", "res/textures/map_16x16.png");
 
         GLuint pointsVBO = 0;
         glGenBuffers(1, &pointsVBO);
@@ -109,6 +116,11 @@ int main(int argc, char** argv) {
         glGenBuffers(1, &colorVBO);
         glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+
+        GLuint texCoordVBO = 0;
+        glGenBuffers(1, &texCoordVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, texCoordVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(texCoord), texCoord, GL_STATIC_DRAW);
 
         GLuint VAO = 0;
         glGenVertexArrays(1, &VAO);
@@ -122,6 +134,13 @@ int main(int argc, char** argv) {
         glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, texCoordVBO);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        pDefaultShaderProgram->use();
+        pDefaultShaderProgram->setInt("tex", 0);
+
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(pWindow)) {
             /* Render here */
@@ -129,6 +148,7 @@ int main(int argc, char** argv) {
 
             pDefaultShaderProgram->use();
             glBindVertexArray(VAO);
+            pTex->bind();
             glDrawArrays(GL_TRIANGLES, 0, 3);
             glBindVertexArray(0);
 
@@ -145,9 +165,9 @@ int main(int argc, char** argv) {
 }
 
 void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height) {
-    g_windowSizeX = width;
-    g_windowSizeY = height;
-    glViewport(0, 0, g_windowSizeX, g_windowSizeY);
+    g_windowSize.x = width;
+    g_windowSize.y = height;
+    glViewport(0, 0, g_windowSize.x, g_windowSize.y);
 }
 
 void glfwKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mode) {
