@@ -2,43 +2,48 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
+#include "../Exception/Exception.h"
 
 namespace Renderer {
     ShaderProgram::ShaderProgram(const std::string& vertexShader,
                                  const std::string& fragmentShader) {
         GLuint vertexShaderID;
-        if (! createShader(vertexShader, GL_VERTEX_SHADER, vertexShaderID)) {
-            std::cerr << "VERTEX SHADER compile-time error" << std::endl;
-            return;
+        try {
+            createShader(vertexShader, GL_VERTEX_SHADER, vertexShaderID);
+        } catch (Exception::Exception& ex) {
+            ex.addMsg("\nVERTEX SHADER compile-time error");
+            throw ex;
         }
 
         GLuint fragmentShaderID;
-        if (! createShader(fragmentShader, GL_FRAGMENT_SHADER, fragmentShaderID)) {
-            std::cerr << "FRAGMENT SHADER compile-time error" << std::endl;
-            // Нужно удалить уже созданный шейдер.
+        try {
+            createShader(fragmentShader, GL_FRAGMENT_SHADER, fragmentShaderID);
+        } catch (Exception::Exception& ex) {
             glDeleteShader(vertexShaderID);
-            return;
+            ex.addMsg("\nFRAGMENT SHADER compile-time error");
+            throw ex;
         }
 
         m_ID = glCreateProgram();
         glAttachShader(m_ID, vertexShaderID);
         glAttachShader(m_ID, fragmentShaderID);
         glLinkProgram(m_ID);
+        // Удаляем шейдеры, так как они больше не нужны, потому что уже привязаны к шейдерной
+        // программе.
+        glDeleteShader(vertexShaderID);
+        glDeleteShader(fragmentShaderID);
 
         GLint success = 0;
         glGetProgramiv(m_ID, GL_LINK_STATUS, &success);
         if (! success) {
             GLchar infoLog[1024];
             glGetProgramInfoLog(m_ID, 1024, nullptr, infoLog);
-            std::cerr << "ERROR::SHADER: Linking-time error\n" << infoLog << std::endl;
+            std::string msg(infoLog);
+            msg += "\nERROR::SHADER: Linking-time error";
+            throw Exception::Exception(msg);
         } else {
             m_isCompiled = true;
         }
-        // Удаляем шейдеры, так как они больше не нужны, потому что уже привязаны к шейдерной
-        // программе.
-        glDeleteShader(vertexShaderID);
-        glDeleteShader(fragmentShaderID);
     }
 
     ShaderProgram::ShaderProgram(Renderer::ShaderProgram&& shaderProgram) noexcept {
@@ -49,22 +54,33 @@ namespace Renderer {
         shaderProgram.m_isCompiled = false;
     }
 
-    ShaderProgram::~ShaderProgram() {
+    ShaderProgram::~ShaderProgram() noexcept {
         glDeleteProgram(m_ID);
     }
 
-    void ShaderProgram::use() const {
+    void ShaderProgram::use() const noexcept {
         glUseProgram(m_ID);
 
     }
 
-    void ShaderProgram::setInt(const std::string& name, const GLint value) {
-        glUniform1i(glGetUniformLocation(m_ID, name.c_str()), value);
+    void ShaderProgram::setUniform(const std::string& name, const GLint value) {
+        auto location = glGetUniformLocation(m_ID, name.c_str());
+        if (location == -1) {
+            throw Exception::Exception(
+                    "ERROR::SHADER_PROGRAM: there is no uniform with the name" +
+                    name);
+        }
+        glUniform1i(location, value);
     }
 
-    void ShaderProgram::setMatrix4(const std::string& name, const glm::mat4 matrix) {
-        glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE,
-                           glm::value_ptr(matrix));
+    void ShaderProgram::setUniform(const std::string& name, const glm::mat4 matrix) {
+        auto location = glGetUniformLocation(m_ID, name.c_str());
+        if (location == -1) {
+            throw Exception::Exception(
+                    "ERROR::SHADER_PROGRAM: there is no uniform with the name " +
+                    name);
+        }
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
     ShaderProgram& ShaderProgram::operator=(Renderer::ShaderProgram&& shaderProgram) noexcept {
@@ -77,7 +93,7 @@ namespace Renderer {
         return *this;
     }
 
-    bool ShaderProgram::createShader(const std::string& source,
+    void ShaderProgram::createShader(const std::string& source,
                                      const GLenum shaderType,
                                      GLuint& shaderID) {
         shaderID = glCreateShader(shaderType);
@@ -90,9 +106,7 @@ namespace Renderer {
         if (! success) {
             GLchar infoLog[1024];
             glGetShaderInfoLog(shaderID, 1024, nullptr, infoLog);
-            std::cerr << "ERROR::SHADER: Compile-time error\n" << infoLog << std::endl;
-            return false;
+            throw Exception::Exception(infoLog);
         }
-        return true;
     }
 }

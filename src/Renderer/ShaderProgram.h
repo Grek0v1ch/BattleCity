@@ -1,14 +1,16 @@
 #pragma once
 
-#include <glad/glad.h>
-
 #include <string>
+
+#include <glad/glad.h>
 #include <glm/ext/matrix_float4x4.hpp>
+
 
 namespace Renderer {
     /**
-    * Класс шейдерной программы для OpenGL. Содержит в себе вершинный и фрагментный шейдеры.
-    * */
+     * Класс шейдерной программы для OpenGL. Программа содержит в себе вершинный и фрагментный
+     * шейдеры.
+     * */
     class ShaderProgram {
     public:
         // Не имеет смысла создавать шейдерную программу без исходного кода шейдеров.
@@ -21,11 +23,11 @@ namespace Renderer {
 
     public:
         /**
-         * Конструктор шейдерной программы. В случае, если по какой-либо причине шейдерную программу
-         * создать нельзя, в std::cerr будет выведено сообщение об ошибке, а полям класса будут
-         * оставлены значения по умолчанию.
-         * @param vertexShader исходный код вершинного шейдера
-         * @param fragmentShader исходный код фрагментного шейдера
+         * Конструктор шейдерной программы.
+         * @param vertexShader исходный код вершинного шейдера.
+         * @param fragmentShader исходный код фрагментного шейдера.
+         * @throw Exception::Exception сообщение будет содержать причину ошибки и указание на
+         * шейдер, в котором была найдена ошибка.
          * */
         ShaderProgram(const std::string& vertexShader, const std::string& fragmentShader);
         /**
@@ -34,7 +36,7 @@ namespace Renderer {
          * @param shaderProgram шейдерная программа для перемещения
          * */
         ShaderProgram(ShaderProgram&& shaderProgram) noexcept;
-        ~ShaderProgram();
+        ~ShaderProgram() noexcept;
 
     public:
         ShaderProgram& operator=(ShaderProgram&& shaderProgram) noexcept;
@@ -44,25 +46,36 @@ namespace Renderer {
         /**
          * Метод запускает шейдерную программу.
          * */
-        void use() const;
-        void setInt(const std::string& name, const GLint value);
-        void setMatrix4(const std::string& name, const glm::mat4 matrix);
+        void use() const noexcept;
+        /**
+         * Метод устанавливает значение соответствующего uniform.
+         * @param name имя uniform.
+         * @param value устанавливаемое значение.
+         * @throw Exception::Exception в случае, если uniform не был найден.
+         * */
+        void setUniform(const std::string& name, GLint value);
+        /**
+         * Метод устанавливает значение соответствующего uniform.
+         * @param name имя uniform.
+         * @param value устанавливаемое значение.
+         * @throw Exception::Exception в случае, если uniform не был найден.
+         * */
+        void setUniform(const std::string& name, glm::mat4 matrix);
 
     private:
-        // Поле показывает, собралась шейдерная программа или нет
+        // Поле показывает, собралась шейдерная программа или нет.
         bool m_isCompiled = false;
-        // Идентификатор шейдерной программы
+        // Идентификатор шейдерной программы.
         GLuint m_ID = 0;
 
     private:
         /**
-         * Метод создает шейдер. В случае, если шейдер создать не получилось, в std::cerr будет
-         * выведено сообщение об ошибке в исходном коде шейдера.
+         * Метод создает шейдер.
          * @param source исходный код создаваемого шейдера
          * @param shaderType тип создаваемого шейдера
          * @param shaderID в данный параметр будет записан идентификатор созданного шейдера
-         * @return true - если шейдер был удачно создан, false - если шейдер создать не удалось
+         * @throw Exception::Exception сообщение с ошибкой компиляции шейдера.
          * */
-        bool createShader(const std::string& source, GLenum shaderType, GLuint& shaderID);
+        void createShader(const std::string& source, GLenum shaderType, GLuint& shaderID);
     };
 }

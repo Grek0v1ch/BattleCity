@@ -99,9 +99,15 @@ int main(int argc, char** argv) {
     // Создаем область видимости, чтобы удалить шейдеры до удаления контекста OpenGL
     {
         ResourceManager resourceManager(argv[0]);
-        auto pDefaultShaderProgram = resourceManager.loadShaders("DefaultShader",
+        std::shared_ptr<Renderer::ShaderProgram> pDefaultShaderProgram;
+        try {
+            pDefaultShaderProgram = resourceManager.loadShaders("DefaultShader",
                                                                  "res/shaders/vertex.txt",
                                                                  "res/shaders/fragment.txt");
+        } catch (const std::exception& ex) {
+            std::cerr << ex.what() << std::endl;
+            return -1;
+        }
         if (!pDefaultShaderProgram) {
             std::cerr << "Can't create shader program: " << "DefaultShader" << std::endl;
             return -1;
@@ -141,7 +147,12 @@ int main(int argc, char** argv) {
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         pDefaultShaderProgram->use();
-        pDefaultShaderProgram->setInt("tex", 0);
+        try {
+            pDefaultShaderProgram->setUniform("tex", 0);
+        } catch (const std::exception& ex) {
+            std::cerr << ex.what() << std::endl;
+            return -1;
+        }
 
         glm::mat4 modelMatrix_1(1.0f);
         modelMatrix_1 = glm::translate(modelMatrix_1, glm::vec3(100, 50, 0));
@@ -152,7 +163,12 @@ int main(int argc, char** argv) {
         glm::mat4 modelMatrix_2(1.0f);
         modelMatrix_2 = glm::translate(modelMatrix_2, glm::vec3(590, 50, 0));
 
-        pDefaultShaderProgram->setMatrix4("projectionMat", projectionMatrix);
+        try {
+            pDefaultShaderProgram->setUniform("projectionMat", projectionMatrix);
+        } catch (const std::exception& ex) {
+            std::cerr << ex.what() << std::endl;
+            return -1;
+        }
 
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(pWindow)) {
@@ -163,10 +179,20 @@ int main(int argc, char** argv) {
             glBindVertexArray(VAO);
             pTex->bind();
 
-            pDefaultShaderProgram->setMatrix4("modelMat", modelMatrix_1);
+            try {
+                pDefaultShaderProgram->setUniform("modelMat", modelMatrix_1);
+            } catch (const std::exception& ex) {
+                std::cerr << ex.what() << std::endl;
+                return -1;
+            }
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
-            pDefaultShaderProgram->setMatrix4("modelMat", modelMatrix_2);
+            try {
+                pDefaultShaderProgram->setUniform("modelMat", modelMatrix_2);
+            } catch (const std::exception& ex) {
+                std::cerr << ex.what() << std::endl;
+                return -1;
+            }
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
             glBindVertexArray(0);
