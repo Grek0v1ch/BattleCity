@@ -1,13 +1,11 @@
 #include "Texture2D.h"
 
 namespace Renderer {
-    Texture2D::Texture2D(const GLuint width, const GLuint height,
+    Texture2D::Texture2D(const GLint width, const GLint height,
                          const unsigned char* data,
                          const unsigned int channels,
-                         const GLenum filter,
-                         const GLenum wrapMode) :
-                         m_width(width),
-                         m_height(height)
+                         const GLint filter, const GLint wrapMode) noexcept :
+                         m_width(width), m_height(height)
                          {
 
         switch (channels) {
@@ -44,7 +42,7 @@ namespace Renderer {
         m_height = texture2D.m_height;
     }
 
-    Texture2D::~Texture2D() {
+    Texture2D::~Texture2D() noexcept {
         glDeleteTextures(1, &m_ID);
     }
 
@@ -58,7 +56,7 @@ namespace Renderer {
         return *this;
     }
 
-    void Texture2D::bind() const {
+    void Texture2D::bind() const noexcept {
         glBindTexture(GL_TEXTURE_2D, m_ID);
     }
 }

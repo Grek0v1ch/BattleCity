@@ -4,6 +4,9 @@
 #include <string>
 
 namespace Renderer {
+    /**
+    * Класс двумерной текстуры.
+    * */
     class Texture2D {
     public:
         Texture2D() = delete;
@@ -12,23 +15,34 @@ namespace Renderer {
         Texture2D& operator=(const Texture2D&) = delete;
 
     public:
-        Texture2D(GLuint width, GLuint height,
+        /**
+         * @param height высота
+         * @param width ширина
+         * @param data массив с данными текстуры
+         * @param channels канальность цвета (по умолчанию 4)
+         * @param filter текстурный фильтр (по умолчанию GL_LINEAR)
+         * @param wrapMode опция wrapping (по умолчанию GL_CLAMP_TO_EDGE)
+         * */
+        Texture2D(GLint width, GLint height,
                   const unsigned char* data,
                   unsigned int channels = 4,
-                  GLenum filter = GL_LINEAR,
-                  GLenum wrapMode = GL_CLAMP_TO_EDGE);
+                  GLint filter = GL_LINEAR,
+                  GLint wrapMode = GL_CLAMP_TO_EDGE) noexcept;
         Texture2D(Texture2D&& texture2D) noexcept;
-        ~Texture2D();
+        ~Texture2D() noexcept;
 
     public:
         Texture2D& operator=(Texture2D&& texture2D) noexcept;
 
-        void bind() const;
+        /**
+         * Метод подключает текстуру к цели GL_TEXTURE_2D.
+         * */
+        void bind() const noexcept;
 
     private:
-        unsigned int m_width;
-        unsigned int m_height;
+        GLint m_width;
+        GLint m_height;
         GLuint m_ID;
-        GLenum m_mode;
+        GLint m_mode;
     };
 }
