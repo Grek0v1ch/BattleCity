@@ -7,6 +7,7 @@
 namespace Renderer {
     class ShaderProgram;
     class Texture2D;
+    class Sprite;
 }
 
 class ResourceManager {
@@ -50,7 +51,13 @@ public:
      * */
     std::shared_ptr<Renderer::Texture2D> getTexture(const std::string& textureName) noexcept;
 
+    std::shared_ptr<Renderer::Sprite> loadSprite(const std::string& spriteName,
+                                                const std::string& textureName,
+                                                const std::string& shaderName,
+                                                unsigned int spriteWidth,
+                                                unsigned int spriteHeight);
 
+    std::shared_ptr<Renderer::Sprite> getSprite(const std::string& spriteName) noexcept;
 private:
     /**
      * Метод читает в std::string весь переданный файл.
@@ -63,9 +70,11 @@ private:
 private:
     using ShaderProgramMap = std::map<std::string, std::shared_ptr<Renderer::ShaderProgram>>;
     using TextureMap = std::map<std::string, std::shared_ptr<Renderer::Texture2D>>;
+    using SpriteMap = std::map<std::string, std::shared_ptr<Renderer::Sprite>>;
 
     ShaderProgramMap m_shaderPrograms;
     TextureMap m_textures;
+    SpriteMap m_sprites;
 
     // Путь к ресурсам
     std::string m_resourcePath;
