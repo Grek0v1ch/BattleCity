@@ -1,6 +1,7 @@
 #include "ResourceManager.h"
 #include "../Renderer/ShaderProgram.h"
 #include "../Renderer/Texture2D.h"
+#include "../Exception/Exception.h"
 
 #include <sstream>
 #include <fstream>
@@ -10,7 +11,7 @@
 #define STBI_ONLY_PNG
 #include "stb_image.h"
 
-ResourceManager::ResourceManager(const std::string& executablePath) {
+ResourceManager::ResourceManager(const std::string& executablePath) noexcept {
     std::size_t found = executablePath.find_last_of("/\\");
     m_resourcePath = executablePath.substr(0, found);
 }
@@ -20,28 +21,28 @@ std::shared_ptr<Renderer::ShaderProgram> ResourceManager::loadShaders(const std:
                                                                       const std::string& fragmentPath){
     std::string vertexString = getFileString(vertexPath);
     if (vertexString.empty()) {
-        std::cerr << "No vertex shader!" << std::endl;
-        return nullptr;
+        throw Exception::Exception("No vertex shader!");
     }
     std::string fragmentString = getFileString(fragmentPath);
     if (fragmentString.empty()) {
-        std::cerr << "No fragment shader!" << std::endl;
-        return nullptr;
+        throw Exception::Exception("No fragment shader!");
     }
-    auto temp = m_shaderPrograms.emplace(shaderName,
-                                         std::make_shared<Renderer::ShaderProgram>(vertexString,
-                                                                                   fragmentString));
-    auto newShader = temp.first->second;
-    if (newShader->isCompiled()) {
-        return newShader;
+    try {
+        auto temp = m_shaderPrograms.emplace(shaderName,
+                                             std::make_shared<Renderer::ShaderProgram>(vertexString,
+                                                                                       fragmentString));
+        return temp.first->second;
+    } catch (Exception::Exception& ex) {
+        std::string msg = "\nCan't load shader program:\nVertex: ";
+        msg += vertexPath + "\nFragment: ";
+        msg += fragmentPath + "\n";
+        ex.addMsg(msg);
+        throw ex;
     }
-    std::cerr << "Can't load shader program:\n"
-        << "Vertex: " << vertexPath << '\n'
-        << "Fragment: " << fragmentPath << std::endl;
-    return nullptr;
 }
 
-std::shared_ptr<Renderer::ShaderProgram> ResourceManager::getShaderProgram(const std::string& shaderName) {
+std::shared_ptr<Renderer::ShaderProgram> ResourceManager::getShaderProgram(
+        const std::string& shaderName) noexcept {
     auto it = m_shaderPrograms.find(shaderName);
     if (it != m_shaderPrograms.end()) {
         return it->second;
@@ -77,7 +78,8 @@ std::shared_ptr<Renderer::Texture2D> ResourceManager::loadTexture(const std::str
     return newTexture;
 }
 
-std::shared_ptr<Renderer::Texture2D> ResourceManager::getTexture(const std::string& textureName) {
+std::shared_ptr<Renderer::Texture2D> ResourceManager::getTexture(
+        const std::string& textureName) noexcept {
     auto it = m_textures.find(textureName);
     if (it != m_textures.end()) {
         return it->second;
@@ -86,7 +88,7 @@ std::shared_ptr<Renderer::Texture2D> ResourceManager::getTexture(const std::stri
     return nullptr;
 }
 
-std::string ResourceManager::getFileString(const std::string& relativeFilePath) const {
+std::string ResourceManager::getFileString(const std::string& relativeFilePath) const noexcept {
     std::ifstream fin(m_resourcePath + "/" + relativeFilePath, std::ios::binary);
     if (! fin.is_open()) {
         std::cerr << "Failed to open file: " << relativeFilePath << std::endl;
