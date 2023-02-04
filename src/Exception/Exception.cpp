@@ -8,6 +8,6 @@ namespace Exception {
     }
 
     void Exception::addMsg(const std::string& newMsg) noexcept {
-        m_msg += newMsg;
+        m_msg = newMsg + m_msg;
     }
 }
