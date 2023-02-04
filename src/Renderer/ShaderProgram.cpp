@@ -11,7 +11,7 @@ namespace Renderer {
         try {
             createShader(vertexShader, GL_VERTEX_SHADER, vertexShaderID);
         } catch (Exception::Exception& ex) {
-            ex.addMsg("\nVERTEX SHADER compile-time error");
+            ex.addMsg("VERTEX SHADER compile-time error\n");
             throw ex;
         }
 
@@ -20,7 +20,7 @@ namespace Renderer {
             createShader(fragmentShader, GL_FRAGMENT_SHADER, fragmentShaderID);
         } catch (Exception::Exception& ex) {
             glDeleteShader(vertexShaderID);
-            ex.addMsg("\nFRAGMENT SHADER compile-time error");
+            ex.addMsg("FRAGMENT SHADER compile-time error\n");
             throw ex;
         }
 
@@ -38,8 +38,8 @@ namespace Renderer {
         if (! success) {
             GLchar infoLog[1024];
             glGetProgramInfoLog(m_ID, 1024, nullptr, infoLog);
-            std::string msg(infoLog);
-            msg += "\nERROR::SHADER: Linking-time error";
+            std::string msg("ERROR::SHADER: Linking-time error\n");
+            msg += infoLog;
             throw Exception::Exception(msg);
         } else {
             m_isCompiled = true;
