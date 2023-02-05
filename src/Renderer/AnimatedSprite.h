@@ -1,18 +1,16 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <glm/vec2.hpp>
+#include "Sprite.h"
 
-#include <memory>
+#include <map>
+#include <vector>
+
+using VectorState = std::vector<std::pair<std::string, uint64_t>>;
 
 namespace Renderer {
-    class Texture2D;
-    class ShaderProgram;
 
-    class Sprite {
+    class AnimatedSprite : public Sprite {
     public:
-        Sprite(const Sprite&) = delete;
-        Sprite& operator=(const Sprite&) = delete;
 
         /**
          * @param pTexture указатель на текстуру спрайта.
@@ -21,27 +19,24 @@ namespace Renderer {
          * @param size размер спрайта (по умолчанию 1)
          * @param rotation угол поворота (по умолчанию 0)
          * */
-        Sprite(std::shared_ptr<Texture2D> pTexture,
+        AnimatedSprite(std::shared_ptr<Texture2D> pTexture,
                const std::string& initialSubTexture,
                std::shared_ptr<ShaderProgram> pShaderProgram,
                const glm::vec2& position = glm::vec2(0.0f),
                const glm::vec2& size = glm::vec2(1.0f),
                float rotation = 0.0f);
-        ~Sprite();
 
-        virtual void render() const;
-        void setPosition(const glm::vec2& position);
-        void setSize(const glm::vec2& size);
-        void setRotation(float rotation);
+        void insertState(std::string state, VectorState subTexturesDuration);
+        void render() const override;
+        void update(uint64_t delta);
+        void setState(const std::string& newState);
 
-    protected:
-        std::shared_ptr<Texture2D> m_pTexture;
-        std::shared_ptr<ShaderProgram> m_pShaderProgram;
-        glm::vec2 m_position;
-        glm::vec2 m_size;
-        float m_rotation;
-        GLuint m_VAO;
-        GLuint m_vertexCoordsVBO;
-        GLuint m_textureCoordsVBO;
+    private:
+        std::map<std::string, VectorState> m_statesMap;
+        size_t m_currentFrame = 0;
+        uint64_t m_currentAnimationTime = 0;
+        std::map<std::string, VectorState>::const_iterator m_pCurrentAnimationDuration;
+        // можно менять в const функциях
+        mutable bool m_dirty = false;
     };
 }

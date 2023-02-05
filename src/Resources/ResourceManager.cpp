@@ -2,6 +2,7 @@
 #include "../Renderer/ShaderProgram.h"
 #include "../Renderer/Texture2D.h"
 #include "../Renderer/Sprite.h"
+#include "../Renderer/AnimatedSprite.h"
 #include "../Exception/Exception.h"
 
 #include <sstream>
@@ -155,6 +156,45 @@ ResourceManager::loadTextureAtlas(const std::string& textureName,
     }
 
     return pTexture;
+}
+
+std::shared_ptr<Renderer::AnimatedSprite>
+ResourceManager::loadAnimatedSprite(const std::string& spriteName,
+                                    const std::string& textureName,
+                                    const std::string& shaderName,
+                                    unsigned int spriteWidth, unsigned int spriteHeight,
+                                    const std::string& subTextureName) {
+    auto pTexture = getTexture(textureName);
+    if (! pTexture) {
+        throw Exception::Exception("Can't find the texture: " + textureName +
+                                   " for the sprite: " + spriteName);
+    }
+
+    auto pShaderProgram = getShaderProgram(shaderName);
+    if (! pShaderProgram) {
+        throw Exception::Exception("Can't find the shader program: " + shaderName +
+                                   " for the sprite: " + spriteName);
+    }
+
+    auto tmp = m_animatedSprite.emplace(spriteName,
+                                        std::make_shared<Renderer::AnimatedSprite>(pTexture,
+                                                                                   subTextureName,
+                                                                                   pShaderProgram,
+                                                                                   glm::vec2(0, 0),
+                                                                                   glm::vec2(spriteWidth, spriteHeight),
+                                                                                   0));
+    auto newSprite = tmp.first->second;
+    return newSprite;
+}
+
+std::shared_ptr<Renderer::AnimatedSprite>
+ResourceManager::getAnimatedSprite(const std::string& spriteName) noexcept {
+    auto it = m_animatedSprite.find(spriteName);
+    if (it != m_animatedSprite.end()) {
+        return it->second;
+    }
+    std::cerr << "Can't find animated sprite: " << spriteName << std::endl;
+    return nullptr;
 }
 
 std::string ResourceManager::getFileString(const std::string& relativeFilePath) const noexcept {
