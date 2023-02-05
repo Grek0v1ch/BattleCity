@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <map>
 #include <memory>
 
@@ -52,12 +53,18 @@ public:
     std::shared_ptr<Renderer::Texture2D> getTexture(const std::string& textureName) noexcept;
 
     std::shared_ptr<Renderer::Sprite> loadSprite(const std::string& spriteName,
-                                                const std::string& textureName,
-                                                const std::string& shaderName,
-                                                unsigned int spriteWidth,
-                                                unsigned int spriteHeight);
+                                                 const std::string& textureName,
+                                                 const std::string& shaderName,
+                                                 unsigned int spriteWidth, unsigned int spriteHeight,
+                                                 const std::string& subTextureName = "default");
 
     std::shared_ptr<Renderer::Sprite> getSprite(const std::string& spriteName) noexcept;
+
+    std::shared_ptr<Renderer::Texture2D> loadTextureAtlas(const std::string& textureName,
+                                                          const std::string& texturePath,
+                                                          const std::vector<std::string>& subTextures,
+                                                          unsigned int subTextureWidth,
+                                                          unsigned int subTextureHeight);
 private:
     /**
      * Метод читает в std::string весь переданный файл.

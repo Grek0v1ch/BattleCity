@@ -22,6 +22,7 @@ namespace Renderer {
          * @param rotation угол поворота (по умолчанию 0)
          * */
         Sprite(std::shared_ptr<Texture2D> pTexture,
+               const std::string& initialSubTexture,
                std::shared_ptr<ShaderProgram> pShaderProgram,
                const glm::vec2& position = glm::vec2(0.0f),
                const glm::vec2& size = glm::vec2(1.0f),
