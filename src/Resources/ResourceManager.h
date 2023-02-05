@@ -14,9 +14,11 @@ namespace Renderer {
 
 class ResourceManager {
 public:
+    ResourceManager() = delete;
     ResourceManager(const ResourceManager&) = delete;
     ResourceManager(ResourceManager&) = delete;
     ResourceManager(ResourceManager&&) = delete;
+    ~ResourceManager() = delete;
     ResourceManager& operator=(const ResourceManager&) = delete;
     ResourceManager& operator=(ResourceManager&&) = delete;
 
@@ -26,13 +28,12 @@ public:
      * @param executablePath абсолютный путь к исполняемому файлу. Папка, в которой лежит исполняемый
      * файл будет считать основной, и все относительный пути будут вестись от нее.
      * */
-    ResourceManager(const std::string& executablePath) noexcept;
-    ~ResourceManager() = default;
+    static void setExecutablePath(const std::string& executablePath) noexcept;
+    static void unloadAllResources();
 
-public:
-    std::shared_ptr<Renderer::ShaderProgram> loadShaders(const std::string& shaderName,
-                                                         const std::string& vertexPath,
-                                                         const std::string& fragmentPath);
+    static std::shared_ptr<Renderer::ShaderProgram>
+    loadShaders(const std::string& shaderName,
+                const std::string& vertexPath, const std::string& fragmentPath);
     /**
      * Метод возвращает указатель на шейдерную программу с заданным именем.
      * @param shaderName имя шейдерной программы для поиска.
@@ -40,10 +41,11 @@ public:
      * В случае, если шейдерная программа не была найдена, в std::cerr будет выведено
      * соответствующее сообщение.
      * */
-    std::shared_ptr<Renderer::ShaderProgram> getShaderProgram(const std::string& shaderName) noexcept;
+    static std::shared_ptr<Renderer::ShaderProgram>
+    getShaderProgram(const std::string& shaderName) noexcept;
 
-    std::shared_ptr<Renderer::Texture2D> loadTexture(const std::string& textureName,
-                                                     const std::string& texturePath);
+    static std::shared_ptr<Renderer::Texture2D>
+    loadTexture(const std::string& textureName, const std::string& texturePath);
     /**
      * Метод возвращает указатель на текстуру с заданным именем.
      * @param textureName имя текстуры для поиска.
@@ -51,30 +53,29 @@ public:
      * В случае, если текстура не была найдена, в std::cerr будет выведено
      * соответствующее сообщение.
      * */
-    std::shared_ptr<Renderer::Texture2D> getTexture(const std::string& textureName) noexcept;
+    static std::shared_ptr<Renderer::Texture2D> getTexture(const std::string& textureName) noexcept;
 
-    std::shared_ptr<Renderer::Sprite> loadSprite(const std::string& spriteName,
-                                                 const std::string& textureName,
-                                                 const std::string& shaderName,
-                                                 unsigned int spriteWidth, unsigned int spriteHeight,
-                                                 const std::string& subTextureName = "default");
+    static std::shared_ptr<Renderer::Sprite>
+    loadSprite(const std::string& spriteName,
+               const std::string& textureName, const std::string& shaderName,
+               unsigned int spriteWidth, unsigned int spriteHeight,
+               const std::string& subTextureName = "default");
 
-    std::shared_ptr<Renderer::Sprite> getSprite(const std::string& spriteName) noexcept;
+    static std::shared_ptr<Renderer::Sprite> getSprite(const std::string& spriteName) noexcept;
 
-    std::shared_ptr<Renderer::Texture2D> loadTextureAtlas(const std::string& textureName,
-                                                          const std::string& texturePath,
-                                                          const std::vector<std::string>& subTextures,
-                                                          unsigned int subTextureWidth,
-                                                          unsigned int subTextureHeight);
+    static std::shared_ptr<Renderer::Texture2D>
+    loadTextureAtlas(const std::string& textureName,
+                     const std::string& texturePath, const std::vector<std::string>& subTextures,
+                     unsigned int subTextureWidth, unsigned int subTextureHeight);
 
-    std::shared_ptr<Renderer::AnimatedSprite> loadAnimatedSprite(const std::string& spriteName,
-                                                                 const std::string& textureName,
-                                                                 const std::string& shaderName,
-                                                                 unsigned int spriteWidth,
-                                                                 unsigned int spriteHeight,
-                                                                 const std::string& subTextureName = "default");
+    static std::shared_ptr<Renderer::AnimatedSprite>
+    loadAnimatedSprite(const std::string& spriteName,
+                       const std::string& textureName, const std::string& shaderName,
+                       unsigned int spriteWidth, unsigned int spriteHeight,
+                       const std::string& subTextureName = "default");
 
-    std::shared_ptr<Renderer::AnimatedSprite> getAnimatedSprite(const std::string& spriteName) noexcept;
+    static std::shared_ptr<Renderer::AnimatedSprite>
+    getAnimatedSprite(const std::string& spriteName) noexcept;
 private:
     /**
      * Метод читает в std::string весь переданный файл.
@@ -82,7 +83,7 @@ private:
      * @return в случае, если прочитать файл не удалось, будет возвращена пустая строка. В std::cerr
      * будет выведено сообщение.
      * */
-    std::string getFileString(const std::string& relativeFilePath) const noexcept;
+    static std::string getFileString(const std::string& relativeFilePath) noexcept;
 
 private:
     using ShaderProgramMap = std::map<std::string, std::shared_ptr<Renderer::ShaderProgram>>;
@@ -90,11 +91,10 @@ private:
     using SpriteMap = std::map<std::string, std::shared_ptr<Renderer::Sprite>>;
     using AnimatedSpriteMap = std::map<std::string, std::shared_ptr<Renderer::AnimatedSprite>>;
 
-    ShaderProgramMap m_shaderPrograms;
-    TextureMap m_textures;
-    SpriteMap m_sprites;
-    AnimatedSpriteMap m_animatedSprite;
-
+    static ShaderProgramMap m_shaderPrograms;
+    static TextureMap m_textures;
+    static SpriteMap m_sprites;
+    static AnimatedSpriteMap m_animatedSprite;
     // Путь к ресурсам
-    std::string m_resourcePath;
+    static std::string m_resourcePath;
 };

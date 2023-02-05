@@ -13,10 +13,25 @@
 #define STBI_ONLY_PNG
 #include "stb_image.h"
 
-ResourceManager::ResourceManager(const std::string& executablePath) noexcept {
+ResourceManager::ShaderProgramMap ResourceManager::m_shaderPrograms;
+ResourceManager::TextureMap ResourceManager::m_textures;
+ResourceManager::SpriteMap ResourceManager::m_sprites;
+ResourceManager::AnimatedSpriteMap ResourceManager::m_animatedSprite;
+// Путь к ресурсам
+std::string ResourceManager::m_resourcePath;
+
+ void ResourceManager::setExecutablePath(const std::string& executablePath) noexcept {
     std::size_t found = executablePath.find_last_of("/\\");
     m_resourcePath = executablePath.substr(0, found);
 }
+
+void ResourceManager::unloadAllResources() {
+     m_shaderPrograms.clear();
+     m_textures.clear();
+     m_sprites.clear();
+     m_animatedSprite.clear();
+     m_resourcePath.clear();
+ }
 
 std::shared_ptr<Renderer::ShaderProgram> ResourceManager::loadShaders(const std::string& shaderName,
                                                                       const std::string& vertexPath,
@@ -197,7 +212,7 @@ ResourceManager::getAnimatedSprite(const std::string& spriteName) noexcept {
     return nullptr;
 }
 
-std::string ResourceManager::getFileString(const std::string& relativeFilePath) const noexcept {
+std::string ResourceManager::getFileString(const std::string& relativeFilePath) noexcept {
     std::ifstream fin(m_resourcePath + "/" + relativeFilePath, std::ios::binary);
     if (! fin.is_open()) {
         std::cerr << "Failed to open file: " << relativeFilePath << std::endl;
