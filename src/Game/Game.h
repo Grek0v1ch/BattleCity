@@ -3,10 +3,12 @@
 #include <array>
 #include <glm/vec2.hpp>
 
+class Tank;
+
 class Game {
 public:
     Game(const glm::vec2& windowSize) noexcept;
-    ~Game() = default;
+    ~Game();
 
     void render();
     void update(uint64_t delta);
@@ -23,4 +25,5 @@ private:
 
     EGameState m_eCurrentGameState;
     glm::ivec2 m_windowSize;
+    std::unique_ptr<Tank> m_pTank;
 };
