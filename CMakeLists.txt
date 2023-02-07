@@ -22,7 +22,11 @@ add_executable(${PROJECT_NAME}
         src/Game/Game.cpp
         src/Game/Game.h
         src/Game/Tank.cpp
-        src/Game/Tank.h)
+        src/Game/Tank.h
+        src/Renderer/VertexBuffer.cpp
+        src/Renderer/VertexBuffer.h
+        src/Renderer/IndexBuffer.cpp
+        src/Renderer/IndexBuffer.h)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
