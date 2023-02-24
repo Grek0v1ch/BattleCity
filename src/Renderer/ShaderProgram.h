@@ -6,7 +6,7 @@
 #include <glm/ext/matrix_float4x4.hpp>
 
 
-namespace Renderer {
+namespace RenderEngine {
     /**
      * Класс шейдерной программы для OpenGL. Программа содержит в себе вершинный и фрагментный
      * шейдеры.

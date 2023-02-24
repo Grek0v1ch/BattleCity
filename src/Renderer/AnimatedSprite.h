@@ -7,7 +7,7 @@
 
 using VectorState = std::vector<std::pair<std::string, uint64_t>>;
 
-namespace Renderer {
+namespace RenderEngine {
 
     class AnimatedSprite : public Sprite {
     public:

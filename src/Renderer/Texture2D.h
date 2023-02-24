@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 
-namespace Renderer {
+namespace RenderEngine {
     /**
     * Класс двумерной текстуры.
     * */

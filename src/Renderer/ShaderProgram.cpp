@@ -4,7 +4,7 @@
 
 #include "../Exception/Exception.h"
 
-namespace Renderer {
+namespace RenderEngine {
     ShaderProgram::ShaderProgram(const std::string& vertexShader,
                                  const std::string& fragmentShader) {
         GLuint vertexShaderID;
@@ -46,7 +46,7 @@ namespace Renderer {
         }
     }
 
-    ShaderProgram::ShaderProgram(Renderer::ShaderProgram&& shaderProgram) noexcept {
+    ShaderProgram::ShaderProgram(RenderEngine::ShaderProgram&& shaderProgram) noexcept {
         m_ID = shaderProgram.m_ID;
         m_isCompiled = shaderProgram.m_isCompiled;
 
@@ -83,7 +83,7 @@ namespace Renderer {
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
-    ShaderProgram& ShaderProgram::operator=(Renderer::ShaderProgram&& shaderProgram) noexcept {
+    ShaderProgram& ShaderProgram::operator=(RenderEngine::ShaderProgram&& shaderProgram) noexcept {
         glDeleteProgram(m_ID);
         m_ID = shaderProgram.m_ID;
         m_isCompiled = shaderProgram.m_isCompiled;

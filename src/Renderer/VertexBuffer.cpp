@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
 
-namespace Renderer {
+namespace RenderEngine {
     VertexBuffer::VertexBuffer() noexcept : m_id(0) {}
 
     VertexBuffer::~VertexBuffer() noexcept {
@@ -13,7 +13,7 @@ namespace Renderer {
         return *this;
     }
 
-    VertexBuffer::VertexBuffer(Renderer::VertexBuffer&& o) noexcept {
+    VertexBuffer::VertexBuffer(RenderEngine::VertexBuffer&& o) noexcept {
         m_id = o.m_id;
         o.m_id = 0;
     }

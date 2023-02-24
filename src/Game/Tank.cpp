@@ -2,7 +2,7 @@
 #include <string>
 #include "../Renderer/AnimatedSprite.h"
 
-Tank::Tank(std::shared_ptr<Renderer::AnimatedSprite> pSprite, float velocity, const glm::vec2& position)
+Tank::Tank(std::shared_ptr<RenderEngine::AnimatedSprite> pSprite, float velocity, const glm::vec2& position)
     :
     m_eOrientation(EOrientation::Top),
     m_pSprite(std::move(pSprite)),

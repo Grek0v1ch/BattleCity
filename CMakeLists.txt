@@ -26,7 +26,13 @@ add_executable(${PROJECT_NAME}
         src/Renderer/VertexBuffer.cpp
         src/Renderer/VertexBuffer.h
         src/Renderer/IndexBuffer.cpp
-        src/Renderer/IndexBuffer.h)
+        src/Renderer/IndexBuffer.h
+        src/Renderer/Renderer.cpp
+        src/Renderer/Renderer.h
+        src/Renderer/VertexArray.cpp
+        src/Renderer/VertexArray.h
+        src/Renderer/VertexBufferLayout.cpp
+        src/Renderer/VertexBufferLayout.h)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 

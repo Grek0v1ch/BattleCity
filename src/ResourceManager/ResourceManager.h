@@ -5,7 +5,7 @@
 #include <map>
 #include <memory>
 
-namespace Renderer {
+namespace RenderEngine {
     class ShaderProgram;
     class Texture2D;
     class Sprite;
@@ -31,7 +31,7 @@ public:
     static void setExecutablePath(const std::string& executablePath) noexcept;
     static void unloadAllResources();
 
-    static std::shared_ptr<Renderer::ShaderProgram>
+    static std::shared_ptr<RenderEngine::ShaderProgram>
     loadShaders(const std::string& shaderName,
                 const std::string& vertexPath, const std::string& fragmentPath);
     /**
@@ -41,10 +41,10 @@ public:
      * В случае, если шейдерная программа не была найдена, в std::cerr будет выведено
      * соответствующее сообщение.
      * */
-    static std::shared_ptr<Renderer::ShaderProgram>
+    static std::shared_ptr<RenderEngine::ShaderProgram>
     getShaderProgram(const std::string& shaderName) noexcept;
 
-    static std::shared_ptr<Renderer::Texture2D>
+    static std::shared_ptr<RenderEngine::Texture2D>
     loadTexture(const std::string& textureName, const std::string& texturePath);
     /**
      * Метод возвращает указатель на текстуру с заданным именем.
@@ -53,28 +53,28 @@ public:
      * В случае, если текстура не была найдена, в std::cerr будет выведено
      * соответствующее сообщение.
      * */
-    static std::shared_ptr<Renderer::Texture2D> getTexture(const std::string& textureName) noexcept;
+    static std::shared_ptr<RenderEngine::Texture2D> getTexture(const std::string& textureName) noexcept;
 
-    static std::shared_ptr<Renderer::Sprite>
+    static std::shared_ptr<RenderEngine::Sprite>
     loadSprite(const std::string& spriteName,
                const std::string& textureName, const std::string& shaderName,
                unsigned int spriteWidth, unsigned int spriteHeight,
                const std::string& subTextureName = "default");
 
-    static std::shared_ptr<Renderer::Sprite> getSprite(const std::string& spriteName) noexcept;
+    static std::shared_ptr<RenderEngine::Sprite> getSprite(const std::string& spriteName) noexcept;
 
-    static std::shared_ptr<Renderer::Texture2D>
+    static std::shared_ptr<RenderEngine::Texture2D>
     loadTextureAtlas(const std::string& textureName,
                      const std::string& texturePath, const std::vector<std::string>& subTextures,
                      unsigned int subTextureWidth, unsigned int subTextureHeight);
 
-    static std::shared_ptr<Renderer::AnimatedSprite>
+    static std::shared_ptr<RenderEngine::AnimatedSprite>
     loadAnimatedSprite(const std::string& spriteName,
                        const std::string& textureName, const std::string& shaderName,
                        unsigned int spriteWidth, unsigned int spriteHeight,
                        const std::string& subTextureName = "default");
 
-    static std::shared_ptr<Renderer::AnimatedSprite>
+    static std::shared_ptr<RenderEngine::AnimatedSprite>
     getAnimatedSprite(const std::string& spriteName) noexcept;
 private:
     /**
@@ -86,10 +86,10 @@ private:
     static std::string getFileString(const std::string& relativeFilePath) noexcept;
 
 private:
-    using ShaderProgramMap = std::map<std::string, std::shared_ptr<Renderer::ShaderProgram>>;
-    using TextureMap = std::map<std::string, std::shared_ptr<Renderer::Texture2D>>;
-    using SpriteMap = std::map<std::string, std::shared_ptr<Renderer::Sprite>>;
-    using AnimatedSpriteMap = std::map<std::string, std::shared_ptr<Renderer::AnimatedSprite>>;
+    using ShaderProgramMap = std::map<std::string, std::shared_ptr<RenderEngine::ShaderProgram>>;
+    using TextureMap = std::map<std::string, std::shared_ptr<RenderEngine::Texture2D>>;
+    using SpriteMap = std::map<std::string, std::shared_ptr<RenderEngine::Sprite>>;
+    using AnimatedSpriteMap = std::map<std::string, std::shared_ptr<RenderEngine::AnimatedSprite>>;
 
     static ShaderProgramMap m_shaderPrograms;
     static TextureMap m_textures;
