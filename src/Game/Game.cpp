@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "../Renderer/ShaderProgram.h"
-#include "../Resources/ResourceManager.h"
+#include "../ResourceManager/ResourceManager.h"
 #include "../Renderer/Texture2D.h"
 #include "../Renderer/Sprite.h"
 #include "../Renderer/AnimatedSprite.h"
