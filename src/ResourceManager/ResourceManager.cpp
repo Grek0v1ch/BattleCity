@@ -249,7 +249,8 @@ bool ResourceManager::loadJSONResources(const std::string& JSONPath) noexcept {
              const unsigned int subTextureHeight = currTextureAtlases["subTextureHeight"].GetUint();
 
              const auto subTexturesArray = currTextureAtlases["subTextures"].GetArray();
-             std::vector<std::string> subTextures(subTexturesArray.Size());
+             std::vector<std::string> subTextures;
+             subTextures.reserve(subTexturesArray.Size());
              for (const auto& currSubTexture : subTexturesArray) {
                  subTextures.emplace_back(currSubTexture.GetString());
              }

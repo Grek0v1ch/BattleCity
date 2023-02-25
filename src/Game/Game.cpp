@@ -121,8 +121,8 @@ void Game::init() {
                                                                     "yellowType1_Top1");
 
     VectorState tankTopState;
-    tankTopState.emplace_back(std::make_pair("tankTop1", 500000000));
-    tankTopState.emplace_back(std::make_pair("tankTop2", 500000000));
+    tankTopState.emplace_back(std::make_pair("yellowType1_Top1", 500000000));
+    tankTopState.emplace_back(std::make_pair("yellowType1_Top2", 500000000));
 
     VectorState tankLeftState;
     tankLeftState.emplace_back(std::make_pair("tankLeft1", 500000000));
