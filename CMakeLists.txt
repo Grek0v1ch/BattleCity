@@ -52,6 +52,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC glad)
 add_subdirectory(external/glm)
 target_link_libraries(${PROJECT_NAME} PUBLIC glm)
 
+include_directories(external/rapidjson/include)
+
 # указываем куда будем класть исполняемый файл
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 

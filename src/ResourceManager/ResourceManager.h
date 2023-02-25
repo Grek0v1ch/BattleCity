@@ -76,6 +76,8 @@ public:
 
     static std::shared_ptr<RenderEngine::AnimatedSprite>
     getAnimatedSprite(const std::string& spriteName) noexcept;
+
+    static bool loadJSONResources(const std::string& JSONPath) noexcept;
 private:
     /**
      * Метод читает в std::string весь переданный файл.

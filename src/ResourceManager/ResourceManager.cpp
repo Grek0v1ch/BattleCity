@@ -13,6 +13,9 @@
 #define STBI_ONLY_PNG
 #include "stb_image.h"
 
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+
 ResourceManager::ShaderProgramMap ResourceManager::m_shaderPrograms;
 ResourceManager::TextureMap ResourceManager::m_textures;
 ResourceManager::SpriteMap ResourceManager::m_sprites;
@@ -211,6 +214,49 @@ ResourceManager::getAnimatedSprite(const std::string& spriteName) noexcept {
     std::cerr << "Can't find animated sprite: " << spriteName << std::endl;
     return nullptr;
 }
+
+bool ResourceManager::loadJSONResources(const std::string& JSONPath) noexcept {
+     const std::string JSONString = getFileString(JSONPath);
+     if (JSONString.empty()) {
+         std::cerr << "No JSON resources file" << std::endl;
+         return false;
+     }
+     rapidjson::Document document;
+     rapidjson::ParseResult parseResult = document.Parse(JSONString.c_str());
+     if (! parseResult) {
+         std::cerr << "JSON parse error: " << rapidjson::GetParseError_En(parseResult.Code())
+                   << " (" << parseResult.Offset() << ")" << std::endl;
+         std::cerr << "In JSON file: " << JSONPath << std::endl;
+         return false;
+     }
+
+     auto shadersIt = document.FindMember("shaders");
+     if (shadersIt != document.MemberEnd()) {
+         for (const auto& currShader : shadersIt->value.GetArray()) {
+             const std::string name = currShader["name"].GetString();
+             const std::string filePath_v = currShader["filePath_v"].GetString();
+             const std::string filePath_f = currShader["filePath_f"].GetString();
+             loadShaders(name, filePath_v, filePath_f);
+         }
+     }
+
+     auto textureAtlasesIt = document.FindMember("textureAtlases");
+     if (textureAtlasesIt != document.MemberEnd()) {
+         for (const auto& currTextureAtlases : textureAtlasesIt->value.GetArray()) {
+             const std::string name = currTextureAtlases["name"].GetString();
+             const std::string filePath = currTextureAtlases["filePath"].GetString();
+             const unsigned int subTextureWidth = currTextureAtlases["subTextureWidth"].GetUint();
+             const unsigned int subTextureHeight = currTextureAtlases["subTextureHeight"].GetUint();
+
+             const auto subTexturesArray = currTextureAtlases["subTextures"].GetArray();
+             std::vector<std::string> subTextures(subTexturesArray.Size());
+             for (const auto& currSubTexture : subTexturesArray) {
+                 subTextures.emplace_back(currSubTexture.GetString());
+             }
+             loadTextureAtlas(name, filePath, subTextures, subTextureWidth, subTextureHeight);
+         }
+     }
+ }
 
 std::string ResourceManager::getFileString(const std::string& relativeFilePath) noexcept {
     std::ifstream fin(m_resourcePath + "/" + relativeFilePath, std::ios::binary);
