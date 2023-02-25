@@ -10,18 +10,18 @@
 namespace RenderEngine {
 
     Sprite::Sprite(std::shared_ptr<Texture2D> pTexture,
-                   std::string initialSubTexture,
+                   const std::string& initialSubTexture,
                    std::shared_ptr<ShaderProgram> pShaderProgram,
                    const glm::vec2& position,
                    const glm::vec2& size,
-                   const float rotation)
-        : m_pTexture(std::move(pTexture))
-        , m_pShaderProgram(std::move(pShaderProgram))
-        , m_position(position)
-        , m_size(size)
-        , m_rotation(rotation)
-    {
-        const GLfloat vertexCoords[] = {
+                   const float rotation) :
+
+                   m_pTexture(std::move(pTexture)),
+                   m_pShaderProgram(std::move(pShaderProgram)),
+                   m_position(position),
+                   m_size(size),
+                   m_rotation(rotation) {
+        const GLfloat vertexCoords[] {
             // 1---2
             // | / |
             // 0  -3
@@ -33,9 +33,9 @@ namespace RenderEngine {
             1.f, 0.f
         };
 
-        auto subTexture = m_pTexture->getSubTexture(std::move(initialSubTexture));
+        auto subTexture = m_pTexture->getSubTexture(initialSubTexture);
 
-        const GLfloat textureCoords[] = {
+        const GLfloat textureCoords[] {
             // U  V
             subTexture.leftBottomUV.x, subTexture.leftBottomUV.y,
             subTexture.leftBottomUV.x, subTexture.rightTopUV.y,
@@ -43,7 +43,7 @@ namespace RenderEngine {
             subTexture.rightTopUV.x,   subTexture.leftBottomUV.y,
         };
 
-        const GLuint indices[] = {
+        const GLuint indices[] {
             0, 1, 2,
             2, 3, 0
         };
@@ -64,12 +64,7 @@ namespace RenderEngine {
         m_indexBuffer.unbind();
     }
 
-    Sprite::~Sprite()
-    {
-    }
-
-    void Sprite::render() const
-    {
+    void Sprite::render() const {
         m_pShaderProgram->use();
 
         glm::mat4 model(1.f);
@@ -90,18 +85,15 @@ namespace RenderEngine {
         Renderer::draw(m_vertexArray, m_indexBuffer, *m_pShaderProgram);
     }
 
-    void Sprite::setPosition(const glm::vec2& position)
-    {
+    void Sprite::setPosition(const glm::vec2& position) {
         m_position = position;
     }
 
-    void Sprite::setSize(const glm::vec2& size)
-    {
+    void Sprite::setSize(const glm::vec2& size) {
         m_size = size;
     }
 
-    void Sprite::setRotation(const float rotation)
-    {
+    void Sprite::setRotation(const float rotation) {
         m_rotation = rotation;
     }
 }
