@@ -114,34 +114,11 @@ void Game::init() {
 
     pAnimatedSprite->setState("waterState");
 
-    auto pTanksAnimatedSprite = ResourceManager::loadAnimatedSprite("TanksAnimatedSprite",
-                                                                    "tanksTextureAtlas",
-                                                                    "spriteShader",
-                                                                    100, 100,
-                                                                    "yellowType1_Top1");
-
-    VectorState tankTopState;
-    tankTopState.emplace_back(std::make_pair("yellowType1_Top1", 500000000));
-    tankTopState.emplace_back(std::make_pair("yellowType1_Top2", 500000000));
-
-    VectorState tankLeftState;
-    tankLeftState.emplace_back(std::make_pair("tankLeft1", 500000000));
-    tankLeftState.emplace_back(std::make_pair("tankLeft2", 500000000));
-
-    VectorState tankBottomState;
-    tankBottomState.emplace_back(std::make_pair("tankBottom1", 500000000));
-    tankBottomState.emplace_back(std::make_pair("tankBottom2", 500000000));
-
-    VectorState tankRightState;
-    tankRightState.emplace_back(std::make_pair("tankRight1", 500000000));
-    tankRightState.emplace_back(std::make_pair("tankRight2", 500000000));
-
-    pTanksAnimatedSprite->insertState("tankTopState",    tankTopState);
-    pTanksAnimatedSprite->insertState("tankLeftState",   tankLeftState);
-    pTanksAnimatedSprite->insertState("tankBottomState", tankBottomState);
-    pTanksAnimatedSprite->insertState("tankRightState",  tankRightState);
-
-    pTanksAnimatedSprite->setState("tankTopState");
+    auto pTanksAnimatedSprite = ResourceManager::getAnimatedSprite("tankAnimatedSprite");
+    if (! pTanksAnimatedSprite) {
+        std::cerr << "Can't find animates sprite: tankAnimatedSprite" << std::endl;
+        return;
+    }
 
     m_pTank = std::make_unique<Tank>(pTanksAnimatedSprite, 0.0000001f, glm::vec2(100, 100));
 }

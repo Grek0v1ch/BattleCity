@@ -257,6 +257,40 @@ bool ResourceManager::loadJSONResources(const std::string& JSONPath) noexcept {
              loadTextureAtlas(name, filePath, subTextures, subTextureWidth, subTextureHeight);
          }
      }
+
+     auto animatedSpriteIt = document.FindMember("animatedSprites");
+     if (animatedSpriteIt != document.MemberEnd()) {
+         for (const auto& currAnimatedSprite : animatedSpriteIt->value.GetArray()) {
+             const std::string name = currAnimatedSprite["name"].GetString();
+             const std::string textureAtlas = currAnimatedSprite["textureAtlas"].GetString();
+             const std::string shader = currAnimatedSprite["shader"].GetString();
+             const unsigned int initialWidth = currAnimatedSprite["initialWidth"].GetUint();
+             const unsigned int initialHeight = currAnimatedSprite["initialHeight"].GetUint();
+             const std::string initialSubTexture = currAnimatedSprite["initialSubTexture"].GetString();
+
+            auto pAnimatedSprite = loadAnimatedSprite(name, textureAtlas, shader,
+                                                      initialWidth, initialHeight,
+                                                      initialSubTexture);
+            if (! pAnimatedSprite) {
+                continue;
+            }
+
+            const auto statesArray = currAnimatedSprite["states"].GetArray();
+            for (const auto& currState : statesArray) {
+                const std::string stateName = currState["stateName"].GetString();
+                std::vector<std::pair<std::string, uint64_t>> frames;
+                const auto framesArray = currState["frames"].GetArray();
+                frames.reserve(framesArray.Size());
+                for (const auto& currFrame : framesArray) {
+                    const std::string subTexture = currFrame["subTexture"].GetString();
+                    const uint64_t duration = currFrame["duration"].GetUint64();
+                    frames.emplace_back(subTexture, duration);
+                }
+                pAnimatedSprite->insertState(stateName, std::move(frames));
+            }
+         }
+     }
+     return true;
  }
 
 std::string ResourceManager::getFileString(const std::string& relativeFilePath) noexcept {
