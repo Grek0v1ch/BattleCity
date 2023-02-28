@@ -290,6 +290,18 @@ bool ResourceManager::loadJSONResources(const std::string& JSONPath) noexcept {
             }
          }
      }
+
+     auto levelsIt = document.FindMember("levels");
+     if (levelsIt != document.MemberEnd()) {
+         for (const auto& currLevels : levelsIt->value.GetArray()) {
+             const auto description = currLevels["description"].GetArray();
+             std::vector<std::string> levelRows;
+             levelRows.reserve(description.Size());
+             for (const auto& currRow : description) {
+                 levelRows.emplace_back(currRow.GetString());
+             }
+         }
+     }
      return true;
  }
 
